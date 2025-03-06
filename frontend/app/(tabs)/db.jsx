@@ -1,0 +1,357 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  SafeAreaView,
+  ActivityIndicator,
+} from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+import { FontAwesome } from '@expo/vector-icons';
+import * as FileSystem from 'expo-file-system';
+
+// API configuration - update with your server IP or domain
+const API_URL = 'http://192.168.43.64:5000/api';
+
+const IdentificationForm = () => {
+  const [cpfNumber, setCpfNumber] = useState('');
+  const [profileImage, setProfileImage] = useState(null);
+  const [aadharImage, setAadharImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCPFChange = (text) => {
+    if (text.length <= 5) {
+      setCpfNumber(text);
+    }
+  };
+
+  // Function to pick image from gallery
+  const pickImage = async (setImageFunction) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageFunction(result.assets[0].uri);
+    }
+  };
+
+  // Function to take picture with camera
+  const takePicture = async (setImageFunction) => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    
+    if (status !== 'granted') {
+      Alert.alert('Permission Denied', 'Sorry, we need camera permissions to make this work!');
+      return;
+    }
+
+    let result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setImageFunction(result.assets[0].uri);
+    }
+  };
+
+  // Function to show options for uploading (camera or gallery)
+  const showImageOptions = (setImageFunction) => {
+    Alert.alert(
+      'Upload Image',
+      'Choose an option',
+      [
+        { 
+          text: 'Take Photo', 
+          onPress: () => takePicture(setImageFunction) 
+        },
+        { 
+          text: 'Choose from Gallery', 
+          onPress: () => pickImage(setImageFunction) 
+        },
+        { 
+          text: 'Cancel', 
+          style: 'cancel' 
+        },
+      ]
+    );
+  };
+
+  // Function to convert image to base64
+  const imageToBase64 = async (uri) => {
+    try {
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+      return base64;
+    } catch (error) {
+      console.error("Error converting image to base64:", error);
+      throw error;
+    }
+  };
+
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    // Validate CPF number (must be exactly 5 characters)
+    if (cpfNumber.length !== 5) {
+      Alert.alert('Error', 'Please enter exactly 5 characters for CPF number');
+      return;
+    }
+  
+    // Check if images are uploaded
+    if (!profileImage) {
+      Alert.alert('Error', 'Please upload or take your photo');
+      return;
+    }
+  
+    if (!aadharImage) {
+      Alert.alert('Error', 'Please upload your Aadhar ID');
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      
+      // Convert images to base64
+      const profileImageBase64 = await imageToBase64(profileImage);
+      const aadharImageBase64 = await imageToBase64(aadharImage);
+      
+      // Prepare data for API submission
+      const formData = {
+        cpfNumber,
+        profileImage: profileImageBase64,
+        aadharImage: aadharImageBase64
+      };
+      
+      // Make API call to submit data
+      const response = await fetch(`${API_URL}/submit-identification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(responseData.error || 'Failed to submit form');
+      }
+      
+      // Reset form on successful submission
+      setCpfNumber('');
+      setProfileImage(null);
+      setAadharImage(null);
+      
+      Alert.alert(
+        'Success', 
+        'Your identification has been submitted successfully. You can check the status using your CPF number.',
+        [{ text: 'OK' }]
+      );
+      
+    } catch (error) {
+      Alert.alert('Submission Failed', error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.title}>Identification Form</Text>
+        
+        {/* CPF Number Input */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>CPF Number</Text>
+          <TextInput
+            style={styles.input}
+            value={cpfNumber}
+            onChangeText={handleCPFChange}
+            placeholder="Enter 5 characters"
+            maxLength={5}
+          />
+          <Text style={styles.helperText}>
+            Enter exactly 5 characters (letters or numbers)
+          </Text>
+        </View>
+
+        {/* Profile Image Upload */}
+        <View style={styles.imageContainer}>
+          <Text style={styles.label}>Profile Photo</Text>
+          <TouchableOpacity 
+            style={styles.uploadButton}
+            onPress={() => showImageOptions(setProfileImage)}
+          >
+            <FontAwesome name="camera" size={22} color="#fff" />
+            <Text style={styles.uploadButtonText}>
+              {profileImage ? 'Change Photo' : 'Take/Upload Photo'}
+            </Text>
+          </TouchableOpacity>
+          
+          {profileImage && (
+            <View style={styles.previewContainer}>
+              <Image source={{ uri: profileImage }} style={styles.preview} />
+              <TouchableOpacity 
+                style={styles.removeButton}
+                onPress={() => setProfileImage(null)}
+              >
+                <FontAwesome name="trash" size={18} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Aadhar ID Upload */}
+        <View style={styles.imageContainer}>
+          <Text style={styles.label}>Aadhar ID</Text>
+          <TouchableOpacity 
+            style={styles.uploadButton}
+            onPress={() => showImageOptions(setAadharImage)}
+          >
+            <FontAwesome name="id-card" size={22} color="#fff" />
+            <Text style={styles.uploadButtonText}>
+              {aadharImage ? 'Change Aadhar ID' : 'Upload Aadhar ID'}
+            </Text>
+          </TouchableOpacity>
+          
+          {aadharImage && (
+            <View style={styles.previewContainer}>
+              <Image source={{ uri: aadharImage }} style={styles.preview} />
+              <TouchableOpacity 
+                style={styles.removeButton}
+                onPress={() => setAadharImage(null)}
+              >
+                <FontAwesome name="trash" size={18} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+
+        {/* Submit Button */}
+        <TouchableOpacity 
+          style={[styles.submitButton, isSubmitting && styles.disabledButton]}
+          onPress={handleSubmit}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.submitButtonText}>Submit</Text>
+          )}
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  scrollContainer: {
+    padding: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    color: '#333',
+    textAlign: 'center',
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: '600',
+    color: '#333',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    fontSize: 16,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+  },
+  imageContainer: {
+    marginBottom: 20,
+  },
+  uploadButton: {
+    backgroundColor: '#3498db',
+    borderRadius: 8,
+    padding: 15,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  uploadButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 10,
+  },
+  previewContainer: {
+    marginTop: 15,
+    position: 'relative',
+    alignItems: 'center',
+  },
+  preview: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(231, 76, 60, 0.8)',
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  submitButton: {
+    backgroundColor: '#27ae60',
+    borderRadius: 8,
+    padding: 18,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  disabledButton: {
+    backgroundColor: '#95a5a6',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
+
+export default IdentificationForm;

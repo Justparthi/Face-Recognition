@@ -1,0 +1,211 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# .env files (for sensitive data)
+.env
+.env.local
+.env.*.local
+
+# Build output
+/dist
+/build
+/out
+
+# Dependency directories
+/bower_components/
+
+# IDEs and editors
+# IntelliJ IDEA
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# NetBeans
+nbproject/
+
+# Eclipse
+.project
+.classpath
+.csettings/
+.idea/
+
+# JetBrains
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Django
+*.log
+*.pot
+*.pyc
+*.db
+*.sqlite3
+
+# Ruby
+*.gem
+*.rbc
+.bundle/
+config.yml
+coverage/
+log/*
+tmp/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+
+# Android
+*.apk
+*.ap_
+// generated folders
+.gradle/
+.idea/
+build/
+local.properties
+
+# iOS
+*.xcodeproj/
+*.xcworkspace/
+*.xcuserstate
+*.swp
+*.swo
+*.log
+.DS_Store
+
+# Composer
+/vendor/
+
+# Laravel
+/vendor/
+.env
+.env.local
+
+# Laravel specific
+*.log
+*.sqlite3
+/storage/*.key
+/storage/*.log
+
+# .NET
+bin/
+obj/
+.vscode/
+
+# Visual Studio for Mac
+.vscode/
+
+# Angular
+node_modules/
+dist/
+
+# Vue.js
+node_modules/
+dist/
+
+# Svelte
+node_modules/
+public/
+
+# TypeScript
+*.tsbuildinfo
+*.js
+*.js.map
+*.d.ts
+*.swp
+.idea/
+*.log
+
+# Swift
+*.xcodeproj/
+*.xcworkspace/
+.idea/
+*.log
+
+# Go
+/bin/
+/pkg/
+
+# Elixir
+deps/
+_build/
+*.ez
+
+# C++
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Haskell
+dist/
+.stack-work/
+
+# Perl
+*.pl~
+*.pm~
+*.bak
+
+# JavaScript Frameworks (React, Vue, Angular, etc.)
+node_modules/
+build/
+dist/
+coverage/
+*.log
+
+# Other
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+*.env
+
+# Build artifacts
+*.tar.gz
+*.zip
+*.rar
+
+# Windows Installer files
+*.cab
+*.msi
+*.msm
+*.msp
+
+# SSH
+.ssh/
+
+# Other specific files (for local configuration)
+.local

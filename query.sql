@@ -1,0 +1,25 @@
+CREATE TABLE otp_requests (
+    id NUMBER PRIMARY KEY,                 
+    mobile_number VARCHAR2(15) NOT NULL,
+    otp VARCHAR2(6) NOT NULL,
+    otp_expiration TIMESTAMP(6) NOT NULL,   
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE users (
+  id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  username VARCHAR2(50) UNIQUE NOT NULL,
+  password VARCHAR2(64) NOT NULL,
+  created_at DATE NOT NULL
+);
+
+
+CREATE TABLE identification_data (
+  id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  cpf_number VARCHAR2(5) NOT NULL,
+  profile_image_path VARCHAR2(255) NOT NULL,
+  aadhar_image_path VARCHAR2(255) NOT NULL,
+  submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  status VARCHAR2(20) DEFAULT 'PENDING'
+);
