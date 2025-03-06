@@ -41,8 +41,8 @@ This mobile application provides secure biometric authentication through facial 
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/face-recognition-app.git
-cd face-recognition-app
+git clone https://github.com/justparthi/Face-Recognition.git
+cd Face-Recognition
 ```
 
 2. Install frontend dependencies
@@ -52,7 +52,7 @@ npm install
 
 3. Install backend dependencies
 ```bash
-cd server
+cd face-reco
 pip install -r requirements.txt
 ```
 
