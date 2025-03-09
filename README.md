@@ -79,7 +79,7 @@ cd ../backend
 node index.js
 
 # Start React Native app
-cd ..
+cd frontend
 npx expo start
 ```
 
