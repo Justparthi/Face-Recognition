@@ -72,7 +72,7 @@ TWILIO_PHONE_NUMBER=your_twilio_phone
 ```bash
 # Start Flask server
 cd server
-python app.py
+python db.py
 
 # Start Node.js server
 cd ../auth-server
@@ -80,7 +80,7 @@ npm start
 
 # Start React Native app
 cd ..
-expo start
+npx expo start
 ```
 
 ## 📱 App Flow
