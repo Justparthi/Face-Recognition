@@ -71,12 +71,12 @@ TWILIO_PHONE_NUMBER=your_twilio_phone
 5. Start the servers
 ```bash
 # Start Flask server
-cd server
+cd face_reco
 python db.py
 
 # Start Node.js server
-cd ../auth-server
-npm start
+cd ../backend
+node index.js
 
 # Start React Native app
 cd ..
